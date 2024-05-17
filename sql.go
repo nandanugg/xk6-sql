@@ -60,7 +60,7 @@ func contains(array []string, element string) bool {
 
 // Open establishes a connection to the specified database type using
 // the provided connection string.
-func (*SQL) Open(database string, connectionString string) (*dbsql.DB, error) {
+func (*SQL) Open(database string, connectionString string, maxIdleConnection, maxOpenConns int) (*dbsql.DB, error) {
 	supportedDatabases := []string{"mysql", "postgres", "sqlite3", "sqlserver", "azuresql", "clickhouse"}
 	if !contains(supportedDatabases, database) {
 		return nil, fmt.Errorf("database %s is not supported", database)
@@ -70,6 +70,9 @@ func (*SQL) Open(database string, connectionString string) (*dbsql.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
+	db.SetMaxIdleConns(maxIdleConnection)
+	db.SetMaxOpenConns(maxOpenConns)
 
 	return db, nil
 }
